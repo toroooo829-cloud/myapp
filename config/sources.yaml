@@ -1,0 +1,24 @@
+sources:
+  rss: []  # RSS収集は現在無効（接続できるソースが見つかり次第追加）
+
+  api:
+    - name: PubMed
+      base_url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
+      reliability: "★★★"
+      type: academic
+      language: en
+      translate: true
+
+    - name: 国立健康・栄養研究所
+      url: https://www.nibiohn.go.jp/
+      reliability: "★★★"
+      type: official
+
+categories:
+  monday: ["食事・栄養", "運動・リハビリ", "メンタル"]
+  tuesday: ["運動・リハビリ", "食事・栄養", "睡眠"]
+  wednesday: ["睡眠・休養", "予防・生活習慣", "食事・栄養"]
+  thursday: ["メンタル・ストレス", "睡眠", "運動"]
+  friday: ["予防・生活習慣", "骨・関節・筋肉", "食事"]
+  saturday: ["骨・関節・筋肉", "運動", "メンタル"]
+  sunday: ["自由テーマ", "食事", "睡眠"]
