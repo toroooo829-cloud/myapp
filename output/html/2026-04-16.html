@@ -363,7 +363,7 @@
 
 <header>
   <div class="logo">すえの<span>PT</span>ノート</div>
-  <div class="header-date">2026年4月15日（水）</div>
+  <div class="header-date">{{DATE_JP}}</div>
 </header>
 
 <nav class="tabs">
@@ -380,64 +380,7 @@
       <p>運動・食事・睡眠の3テーマをお届けします</p>
     </div>
 
-    <div class="cards">
-      <button class="card" onclick="openDetail(0)">
-        <div class="card-inner">
-          <div class="card-top">
-            <span class="category-badge">🏃 運動・リハビリ</span>
-            <span class="card-num">01 / 03</span>
-          </div>
-          <h3>「座りすぎ」は喫煙と同じくらい<br>体に悪いって、本当だった</h3>
-          <p class="card-lead">1日8時間以上座り続けると、死亡リスクが最大60%上昇するという研究があります。30分に1回立ち上がるだけで、そのリスクを大幅に下げられます。</p>
-        </div>
-        <div class="card-footer">
-          <div class="card-footer-left">
-            <div class="avatar-sm">す</div>
-            <span>すえ（PT）</span>
-            <span class="stars-sm">★★★</span>
-          </div>
-          <span class="read-more">読む →</span>
-        </div>
-      </button>
-
-      <button class="card" onclick="openDetail(1)">
-        <div class="card-inner">
-          <div class="card-top">
-            <span class="category-badge">🥦 食事・栄養</span>
-            <span class="card-num">02 / 03</span>
-          </div>
-          <h3>腸内環境を整えるだけで<br>免疫力が劇的に変わる理由</h3>
-          <p class="card-lead">免疫細胞の約70%は腸に集中しています。毎日の食事に発酵食品をひとつ加えるだけで、腸内細菌のバランスが整い始めます。</p>
-        </div>
-        <div class="card-footer">
-          <div class="card-footer-left">
-            <div class="avatar-sm">す</div>
-            <span>すえ（PT）</span>
-            <span class="stars-sm">★★★</span>
-          </div>
-          <span class="read-more">読む →</span>
-        </div>
-      </button>
-
-      <button class="card" onclick="openDetail(2)">
-        <div class="card-inner">
-          <div class="card-top">
-            <span class="category-badge">🌙 睡眠・休養</span>
-            <span class="card-num">03 / 03</span>
-          </div>
-          <h3>寝る前のスマホが、睡眠の質を<br>思った以上に下げていた</h3>
-          <p class="card-lead">就寝1時間前のスマホ使用は、深い睡眠の割合を最大20%減らすという研究があります。夜の光の質を変えるだけで、朝の目覚めが変わります。</p>
-        </div>
-        <div class="card-footer">
-          <div class="card-footer-left">
-            <div class="avatar-sm">す</div>
-            <span>すえ（PT）</span>
-            <span class="stars-sm">★★</span>
-          </div>
-          <span class="read-more">読む →</span>
-        </div>
-      </button>
-    </div>
+    <div class="cards" id="cards-container"></div>
 
     <div class="pagination" style="margin-top:32px">
       <button class="page-btn">← 昨日</button>
@@ -450,41 +393,33 @@
 </main>
 
 <script>
-const tips = [
-  {
-    category: '🏃 運動・リハビリ',
-    title: '「座りすぎ」は喫煙と同じくらい体に悪いって、本当だった',
-    core: '1日8時間以上座り続けると、死亡リスクが最大60%上昇するという研究があります。30分に1回、立ち上がるだけで、そのリスクを大幅に下げられます。',
-    detail: 'Lancetに掲載された100万人以上を対象とした大規模研究によると、「座位時間の長さ」は心疾患・糖尿病・がんのリスクと強く関連しています。<br><br>重要なのは、週末にまとめて運動しても「座りすぎ」のリスクを相殺できないという点。毎日こまめに動くことが鍵です。<br><br>目安は「30分座ったら3分立つ」。飲み物を取りに行く・電話は立って受けるなど、小さな工夫で習慣化できます。',
-    pt: 'デイケアの利用者さんを見ていても、「動く習慣がある人」は明らかに元気が長持ちします。激しい運動じゃなくていい。立って歩いて、それだけで体は応えてくれます。僕自身、犬の散歩が習慣になってから腰の重さが全然違います。',
-    post: '「30分座ったら立ち上がる」これだけで死亡リスクが下がるって知ってますか？🪑\n\n1日8時間以上の座りすぎは喫煙並みのリスクという研究があります。激しい運動じゃなくていい。立って、少し歩く。それだけで体は応えてくれます。\n\nPT歴8年の僕が一番大事にしている習慣の話でした💪\n\n#健康 #理学療法士 #リベシティ #予防',
-    source: 'Lancet / NHK健康チャンネル',
-    stars: '★★★', reliability: '高（査読論文）',
-    tags: ['#座りすぎ','#生活習慣','#予防医学','#理学療法']
-  },
-  {
-    category: '🥦 食事・栄養',
-    title: '腸内環境を整えるだけで免疫力が劇的に変わる理由',
-    core: '免疫細胞の約70%は腸に集中しています。毎日の食事に発酵食品をひとつ加えるだけで、腸内細菌のバランスが整い始めます。',
-    detail: '腸は「第2の脳」とも呼ばれ、免疫応答の中心的な役割を担っています。腸内フローラのバランスが崩れると、アレルギー・慢性炎症・気分の落ち込みにまで影響することがわかっています。<br><br>発酵食品（ヨーグルト・味噌・納豆・ぬか漬けなど）には生きた乳酸菌が含まれ、毎日継続することで腸内環境の改善が期待できます。<br><br>食物繊維（野菜・きのこ・海藻）と組み合わせると、善玉菌のエサになりさらに効果的です。',
-    pt: '患者さんに「食欲がない」「疲れやすい」と言われたとき、食事の話を聞くと発酵食品がほとんど入っていないことが多いです。味噌汁一杯から始めてもらうだけで、3週間後に「なんか体が軽くなった」と言ってくれる方がいます。',
-    post: '腸を整えるだけで、免疫・気分・疲れやすさまで変わります🦠\n\n免疫細胞の70%は腸にいます。難しいことをしなくていい。毎日の食事に発酵食品（納豆・ヨーグルト・味噌汁）をひとつ足すだけでOK。\n\nデイケアで実感している、小さくて大事な習慣のひとつです✨\n\n#腸活 #免疫力 #食事 #健康習慣',
-    source: '厚生労働省 e-ヘルスネット / Nature Medicine',
-    stars: '★★★', reliability: '高（査読論文）',
-    tags: ['#腸活','#免疫力','#発酵食品','#栄養']
-  },
-  {
-    category: '🌙 睡眠・休養',
-    title: '寝る前のスマホが、睡眠の質を思った以上に下げていた',
-    core: '就寝1時間前のスマホ使用は、深い睡眠の割合を最大20%減らすという研究があります。夜の光の質を変えるだけで、朝の目覚めが変わります。',
-    detail: 'スマホのブルーライトは、睡眠ホルモン「メラトニン」の分泌を抑制します。メラトニンが出にくくなると、入眠が遅れ・深い睡眠（ノンレム睡眠）が減少します。<br><br>特に問題なのは「明るさ」だけでなく「SNSや動画の情報刺激」。脳が興奮状態になり、質の高い睡眠に入りにくくなります。<br><br>対策は「寝る1時間前からスマホを別室へ」か「夜間モード＋読書に切り替える」。数日で効果を実感できる人が多いです。',
-    pt: '「最近眠れない」と話してくれる利用者さんに聞くと、夜中にスマホを見てしまうパターンが多い。体を動かす仕事をしている僕も、スマホをやめた夜は明らかに翌朝の目覚めが違います。睡眠は「時間」より「質」だと実感しています。',
-    post: '寝る前のスマホ、やめるだけで朝が変わります📱💤\n\nブルーライトが睡眠ホルモンを抑えて、深い眠りを最大20%も減らすという研究があります。\n\n今夜から「寝る1時間前はスマホを遠ざける」だけ試してみてください。数日で朝の目覚めが変わるはずです。\n\n#睡眠 #スマホ断ち #健康習慣 #リベシティ',
-    source: 'NHK健康チャンネル / Sleep Medicine Reviews',
-    stars: '★★', reliability: '中〜高（信頼メディア）',
-    tags: ['#睡眠','#ブルーライト','#夜のルーティン','#休養']
-  }
-];
+const tips = [{"category": "🧘 メンタル・ストレス", "title": "深呼吸でストレスを即リセット", "core": "4秒吸って8秒で吐く「4-8呼吸法」は、副交感神経を優位にしてストレス反応を和らげると言われています。いつでもどこでも実践できます。", "detail": "ストレスを感じたとき、呼吸は浅く速くなりがちです。意識して深くゆっくり呼吸することが自律神経のバランスを整えます。仕事の合間や就寝前の習慣にすると効果的です。", "pt": "介護の現場でも、精神的な余裕が動く意欲につながります。利用者さんの笑顔が見られる日は、こちらも元気になれます。心と体はつながっています。", "post": "【今日の健康Tips】\n深呼吸でストレスを即リセット\n\n4秒吸って8秒で吐く「4-8呼吸法」は、副交感神経を優位にしてストレス反応を和らげると言われています。いつでもどこでも実践できます。\n\n詳しくはプロフのリンクから✨\n\n#健康Tips #メンタルヘルス #ストレス #理学療法士 #PTすえ", "source": "PubMed / Srp Arh Celok Lek（https://pubmed.ncbi.nlm.nih.gov/24502097/）", "stars": "★★★", "reliability": "高（公的機関・論文）", "tags": ["#健康Tips", "#メンタルヘルス", "#ストレス", "#理学療法士", "#PTすえ"]}, {"category": "😴 睡眠", "title": "良質な睡眠のための3つの習慣", "core": "①起床時間を毎日一定にする ②朝に光を浴びる ③寝る前はリラックスする、この3つで睡眠の質が上がると言われています。", "detail": "睡眠の質は量だけでなくリズムが大切です。週末の「寝だめ」は体内時計を乱すことがあります。規則正しい生活が最大の睡眠対策です。", "pt": "犬の散歩を朝の日課にしてから、睡眠リズムが整ってきたと実感しています。", "post": "【今日の健康Tips】\n良質な睡眠のための3つの習慣\n\n①起床時間を毎日一定にする ②朝に光を浴びる ③寝る前はリラックスする、この3つで睡眠の質が上がると言われています。\n\n詳しくはプロフのリンクから✨\n\n#健康Tips #睡眠 #理学療法士 #PTすえ", "source": "PubMed / Nutrients（https://pubmed.ncbi.nlm.nih.gov/35565879/）", "stars": "★★★", "reliability": "高（公的機関・論文）", "tags": ["#健康Tips", "#睡眠", "#理学療法士", "#PTすえ"]}, {"category": "🏃 運動", "title": "椅子スクワットで下肢筋力アップ", "core": "椅子から立ち座りする動作を繰り返すだけで、大腿四頭筋・臀筋を鍛えられます。転倒予防の基本運動です。", "detail": "1セット10回を1日3セットから始めましょう。膝が痛い場合は浅めに、手すりを使いながらでも構いません。できることから続けることが大切です。", "pt": "「使わないと衰える」これが廃用の本質です。利用者さんにも毎日お伝えしています。", "post": "【今日の健康Tips】\n椅子スクワットで下肢筋力アップ\n\n椅子から立ち座りする動作を繰り返すだけで、大腿四頭筋・臀筋を鍛えられます。転倒予防の基本運動です。\n\n詳しくはプロフのリンクから✨\n\n#健康Tips #運動 #理学療法士 #PTすえ", "source": "PubMed / J Neural Transm (Vienna)（https://pubmed.ncbi.nlm.nih.gov/18726137/）", "stars": "★★★", "reliability": "高（公的機関・論文）", "tags": ["#健康Tips", "#運動", "#理学療法士", "#PTすえ"]}];
+
+// カード一覧を動的生成
+(function renderCards() {
+  const container = document.getElementById('cards-container');
+  if (!container) return;
+  container.innerHTML = tips.map((t, i) => `
+    <button class="card" onclick="openDetail(${i})">
+      <div class="card-inner">
+        <div class="card-top">
+          <span class="category-badge">${t.category}</span>
+          <span class="card-num">${String(i+1).padStart(2,'0')} / ${String(tips.length).padStart(2,'0')}</span>
+        </div>
+        <h3>${t.title}</h3>
+        <p class="card-lead">${t.core}</p>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-left">
+          <div class="avatar-sm">す</div>
+          <span>すえ（PT）</span>
+          <span class="stars-sm">${t.stars}</span>
+        </div>
+        <span class="read-more">読む →</span>
+      </div>
+    </button>
+  `).join('');
+})();
 
 function openDetail(index) {
   const t = tips[index];
