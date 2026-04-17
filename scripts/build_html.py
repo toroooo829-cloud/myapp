@@ -158,8 +158,15 @@ def build(date: datetime.date) -> Path | None:
 
 def main():
     today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
+
     print(f"HTML生成開始: {today}")
     build(today)
+
+    # 昨日のHTMLが存在すれば再生成（翌日ナビボタンを追加するため）
+    if (DAILY_DIR / f"{yesterday.isoformat()}.json").exists():
+        print(f"昨日のHTML再生成: {yesterday}")
+        build(yesterday)
 
 
 if __name__ == "__main__":
