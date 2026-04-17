@@ -91,12 +91,37 @@ def render_html(template: str, data: dict) -> str:
           </div>
         </div>"""
 
+    # 日本語日付
+    import datetime as _dt
+    weekday_jp = ["月", "火", "水", "木", "金", "土", "日"]
+    _d = _dt.date.fromisoformat(date_str)
+    date_jp = f"{_d.year}年{_d.month}月{_d.day}日（{weekday_jp[_d.weekday()]}）"
+
+    # 前日・翌日ナビゲーションボタン生成
+    BASE_URL = "https://toroooo829-cloud.github.io/myapp/output/html"
+    prev_date = _d - _dt.timedelta(days=1)
+    next_date = _d + _dt.timedelta(days=1)
+
+    prev_html_path = HTML_DIR / f"{prev_date.isoformat()}.html"
+    next_html_path = HTML_DIR / f"{next_date.isoformat()}.html"
+
+    if prev_html_path.exists():
+        prev_btn = f'<button class="page-btn" onclick="location.href=\'{BASE_URL}/{prev_date.isoformat()}.html\'">← {prev_date.month}月{prev_date.day}日</button>'
+    else:
+        prev_btn = '<span></span>'
+
+    if next_html_path.exists():
+        next_btn = f'<button class="page-btn" onclick="location.href=\'{BASE_URL}/{next_date.isoformat()}.html\'">{next_date.month}月{next_date.day}日 →</button>'
+    else:
+        next_btn = '<span></span>'
+
     # テンプレートに置換
     html = template
     html = html.replace("{{DATE}}", date_str)
-    html = html.replace("{{CARDS}}", cards_html)
-    html = html.replace("{{DETAILS}}", details_html)
+    html = html.replace("{{DATE_JP}}", date_jp)
     html = html.replace("{{TIPS_JSON}}", json.dumps(tips, ensure_ascii=False))
+    html = html.replace("{{PREV_DAY_BTN}}", prev_btn)
+    html = html.replace("{{NEXT_DAY_BTN}}", next_btn)
 
     return html
 
