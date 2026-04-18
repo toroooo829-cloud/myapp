@@ -1,0 +1,183 @@
+name: 毎日の健康Tips自動生成
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # 毎朝7時JST（UTC 22:00）
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  health-tips:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # リポジトリへのプッシュ権限
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Claude で健康Tips を生成・発信
+        uses: anthropic/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            あなたは理学療法士「すえ（太一）」のアシスタントです。以下のパイプラインをWebFetchツールのみで実行してください。ローカルファイルやBashは使用しません。全ての操作はAPIで行います。
+
+            ## 認証情報
+            - GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - GITHUB_REPO: toroooo829-cloud/myapp
+            - GITHUB_PAGES_BASE: https://toroooo829-cloud.github.io/myapp/output/html
+            - LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+            - LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+
+            ## STEP 1: 今日の日付と曜日を確認する
+
+            今日の日付をISO形式（YYYY-MM-DD）で確認してください。曜日に応じて3つのカテゴリを選択します：
+
+            | 曜日 | 1本目 | 2本目 | 3本目 |
+            |------|-------|-------|-------|
+            | 月   | 予防・生活習慣 | 骨・関節・筋肉 | 食事・栄養 |
+            | 火   | 運動・リハビリ | 食事・栄養 | 睡眠・休養 |
+            | 水   | 睡眠・休養 | 予防・生活習慣 | 食事・栄養 |
+            | 木   | メンタル・ストレス | 睡眠・休養 | 運動・リハビリ |
+            | 金   | 予防・生活習慣 | 骨・関節・筋肉 | 食事・栄養 |
+            | 土   | 骨・関節・筋肉 | 運動・リハビリ | メンタル・ストレス |
+            | 日   | 自由テーマ | 食事・栄養 | 睡眠・休養 |
+
+            ## STEP 2: PubMedで各カテゴリの論文を検索する
+
+            WebFetchで以下のURLを呼び出し、各カテゴリの最新論文IDを取得してください。
+
+            カテゴリと検索クエリのマッピング：
+            - 食事・栄養: `nutrition+diet+health`
+            - 運動・リハビリ: `exercise+rehabilitation+physical+activity`
+            - 睡眠・休養: `sleep+quality+health`
+            - メンタル・ストレス: `mental+health+stress+management`
+            - 予防・生活習慣: `preventive+medicine+lifestyle+disease+prevention`
+            - 骨・関節・筋肉: `musculoskeletal+bone+muscle+joint+health`
+            - 自由テーマ: `public+health+wellness+latest+2025`
+
+            検索URL例：
+            `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=QUERY`
+
+            取得したPMIDのうち1件について、論文概要を取得：
+            `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=abstract&rettype=abstract&id=PMID`
+
+            3カテゴリ分を繰り返してください。
+
+            ## STEP 3: 3本のTipsを生成する
+
+            ### 発信者プロフィール（必ず反映すること）
+            - 職業：理学療法士（PT）、福井県の介護・デイケア施設勤務、8年目
+            - 発信スタンス：難しい医学情報を「生活に使える言葉」に変換
+            - ペルソナ名：すえ
+
+            ### 生成ルール
+            - トーン：親しみやすく、専門用語は使わず、根拠あり
+            - 文体：です・ます調。断定しすぎず「〜と言われています」「〜が大切です」
+            - PTひとこと：介護・デイケア現場の実体験、「転倒予防」「廃用予防」「QOL」の視点を優先、150字以内
+            - 医療アドバイス・診断に当たる表現は避ける
+
+            ### 各Tipsに必要な項目
+            各Tipsは以下のJSONフォーマットで生成してください：
+
+            ```json
+            {
+              "category": "🏃 運動・リハビリ",
+              "title": "タイトル",
+              "core": "今日のTips（1〜2文で核心）",
+              "detail": "詳しい説明（3〜5文、段落区切りは<br><br>）",
+              "pt": "PTすえのひとこと（150字以内）",
+              "post": "リベシティ投稿用テキスト（140〜200字、ハッシュタグ含む）",
+              "source": "PubMed（論文タイトル略称）",
+              "stars": "★★★",
+              "reliability": "高（査読論文）",
+              "tags": ["#タグ1", "#タグ2", "#タグ3"]
+            }
+            ```
+
+            カテゴリ絵文字：食事→🥗 運動→🏃 睡眠→😴 メンタル→🧠 予防→🛡️ 骨・筋肉→💪 自由→🌟
+
+            ## STEP 4: HTMLテンプレートをGitHubから取得する
+
+            WebFetch GET: `https://raw.githubusercontent.com/toroooo829-cloud/myapp/main/templates/viewer.html`
+
+            ## STEP 5: HTMLを構築する
+
+            取得したテンプレートの以下のプレースホルダーを置換してください：
+            1. `{{DATE_JP}}` → 日本語日付（例：2026年4月18日（土））
+            2. `{{TIPS_JSON}}` → STEP3で生成した3件のTips配列のJSON文字列
+            3. `{{PREV_DAY_BTN}}` → `<span></span>`
+            4. `{{NEXT_DAY_BTN}}` → `<span></span>`
+
+            ## STEP 6: GitHub Git Data APIでファイルをプッシュする
+
+            ヘッダー（全リクエスト共通）：
+            - Authorization: token ${{ secrets.GITHUB_TOKEN }}
+            - Content-Type: application/json
+            - X-GitHub-Api-Version: 2022-11-28
+
+            ### 6-1. mainブランチの最新コミットSHAを取得
+            GET: `https://api.github.com/repos/toroooo829-cloud/myapp/git/refs/heads/main`
+            → `object.sha` = COMMIT_SHA
+
+            ### 6-2. コミットのツリーSHAを取得
+            GET: `https://api.github.com/repos/toroooo829-cloud/myapp/git/commits/{COMMIT_SHA}`
+            → `tree.sha` = BASE_TREE_SHA
+
+            ### 6-3. JSONファイルのblobを作成
+            POST: `https://api.github.com/repos/toroooo829-cloud/myapp/git/blobs`
+            Body: `{"content": "{\"date\":\"YYYY-MM-DD\",\"tips\":[...STEP3の3件...]}", "encoding": "utf-8"}`
+            → `sha` = JSON_BLOB_SHA
+
+            ### 6-4. HTMLファイルのblobを作成
+            POST: `https://api.github.com/repos/toroooo829-cloud/myapp/git/blobs`
+            Body: `{"content": "<STEP5で完成させたHTML全文>", "encoding": "utf-8"}`
+            → `sha` = HTML_BLOB_SHA
+
+            ### 6-5. 新しいツリーを作成
+            POST: `https://api.github.com/repos/toroooo829-cloud/myapp/git/trees`
+            Body:
+            ```json
+            {
+              "base_tree": "<BASE_TREE_SHA>",
+              "tree": [
+                {"path": "output/daily/YYYY-MM-DD.json", "mode": "100644", "type": "blob", "sha": "<JSON_BLOB_SHA>"},
+                {"path": "output/html/YYYY-MM-DD.html", "mode": "100644", "type": "blob", "sha": "<HTML_BLOB_SHA>"}
+              ]
+            }
+            ```
+            → `sha` = NEW_TREE_SHA
+
+            ### 6-6. コミットを作成
+            POST: `https://api.github.com/repos/toroooo829-cloud/myapp/git/commits`
+            Body: `{"message": "Add tips YYYY-MM-DD [auto]", "tree": "<NEW_TREE_SHA>", "parents": ["<COMMIT_SHA>"]}`
+            → `sha` = NEW_COMMIT_SHA
+
+            ### 6-7. mainブランチを更新
+            PATCH: `https://api.github.com/repos/toroooo829-cloud/myapp/git/refs/heads/main`
+            Body: `{"sha": "<NEW_COMMIT_SHA>"}`
+
+            ## STEP 7: LINE通知を送信する
+
+            POST: `https://api.line.me/v2/bot/message/push`
+            Headers:
+            - Authorization: Bearer ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+            - Content-Type: application/json
+
+            Body:
+            ```json
+            {
+              "to": "${{ secrets.LINE_USER_ID }}",
+              "messages": [{
+                "type": "text",
+                "text": "🌿 今日の健康Tips（YYYY-MM-DD）\n\n【1】{category1}\n📌 {title1}\n{core1}\n信頼度：{stars1}\n\n【2】{category2}\n📌 {title2}\n{core2}\n信頼度：{stars2}\n\n【3】{category3}\n📌 {title3}\n{core3}\n信頼度：{stars3}\n\n──────────────\n📂 詳細はこちら👇\nhttps://toroooo829-cloud.github.io/myapp/output/html/YYYY-MM-DD.html"
+              }]
+            }
+            ```
+
+            ## 完了報告
+            全ステップ完了後、以下をまとめてください：
+            - 実行日時・生成した3本のTipsタイトル
+            - GitHubプッシュ結果（成功/失敗）
+            - LINE送信結果（成功/失敗）
+            - GitHub Pages URL
