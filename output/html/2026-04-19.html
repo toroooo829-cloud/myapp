@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日の健康Tips｜すえのPTノート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --accent: #41b37d;
+    --accent-light: #e8f7f0;
+    --accent-deep: #2d8a5e;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-muted: #a0a0a0;
+    --border: #e8e4dc;
+    --tag-bg: #f0ede6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ヘッダー */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .logo span { color: var(--accent); }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* タブ */
+  .tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tab.active { color: var(--text-primary); font-weight: 500; border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text-secondary); }
+
+  /* メイン */
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 0;
+  }
+
+  /* 一覧 */
+  .day-header {
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .day-header h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .day-header p { font-size: 13px; color: var(--text-muted); font-weight: 300; }
+
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.12s; }
+  .card:nth-child(3) { animation-delay: 0.19s; }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-2px); }
+
+  .card-inner { padding: 20px 22px; }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-light);
+    color: var(--accent-deep);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .card-num { font-size: 11px; color: var(--text-muted); }
+
+  .card h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .card-lead {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 10px 22px;
+    border-top: 1px solid var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fdfcfa;
+  }
+
+  .card-footer-left { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+
+  .avatar-sm {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white; font-weight: 700;
+  }
+
+  .stars-sm { color: var(--accent); font-size: 10px; letter-spacing: -1px; }
+  .read-more { font-size: 12px; color: var(--accent); }
+
+  /* 詳細 */
+  .detail-view { display: none; animation: fadeUp 0.35s ease both; }
+  .detail-view.active { display: block; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .detail-category-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .detail-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .avatar-md {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: white; font-weight: 700;
+  }
+
+  .author-name { font-size: 13px; font-weight: 500; }
+  .author-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .tips-card {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .tips-card p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    line-height: 1.85;
+    font-weight: 500;
+  }
+
+  .detail-text {
+    font-size: 15px;
+    line-height: 1.95;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  .pt-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .pt-note::before {
+    content: '💬';
+    position: absolute;
+    top: -12px; left: 18px;
+    background: var(--bg);
+    padding: 0 4px;
+    font-size: 18px;
+  }
+  .pt-note p { font-size: 14px; line-height: 1.85; color: var(--text-secondary); font-style: italic; }
+  .pt-note .sig { margin-top: 10px; font-size: 12px; color: var(--text-muted); font-style: normal; text-align: right; }
+
+  .post-box {
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .post-box p { font-size: 14px; line-height: 1.85; }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: #333; }
+  .copy-btn.copied { background: var(--accent); }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .meta-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .stars { color: var(--accent); letter-spacing: -1px; }
+
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .tag { background: var(--tag-bg); color: var(--text-secondary); font-size: 12px; padding: 4px 12px; border-radius: 20px; }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">すえの<span>PT</span>ノート</div>
+  <div class="header-date">2026年4月19日（日）</div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" onclick="switchTab(this)">今日の3本</div>
+  <div class="tab" onclick="switchTab(this)">今週のまとめ</div>
+  <div class="tab" onclick="switchTab(this)">アーカイブ</div>
+</nav>
+
+<main>
+
+  <div id="list-view">
+    <div class="day-header">
+      <h2>今日の健康Tips</h2>
+      <p>運動・食事・睡眠の3テーマをお届けします</p>
+    </div>
+
+    <div class="cards" id="cards-container"></div>
+
+    <div class="pagination" style="margin-top:32px">
+      <button class="page-btn" onclick="location.href='https://toroooo829-cloud.github.io/myapp/output/html/2026-04-18.html'">← 4月18日</button>
+      <span></span>
+    </div>
+  </div>
+
+  <div id="detail-view" class="detail-view"></div>
+
+</main>
+
+<script>
+const tips = [{"category": "✨ 自由テーマ", "title": "「歩き方」を少し変えるだけで\n腰痛が楽になる", "core": "つま先をまっすぐ前に向けて歩くことと、やや大股で歩くことで、腰への負担が大幅に軽減されると言われています。歩き方は意識で変えられます。", "detail": "多くの腰痛は「悪い姿勢の積み重ね」から来ています。特に内股歩きや小股歩きは骨盤の歪みにつながりやすく、腰への負担を増やします。<br><br>正しい歩き方のポイント：①かかとから着地する ②つま先をまっすぐ前に向ける ③お腹を軽く引き込む ④腕を自然に振る。<br><br>最初は意識が必要ですが、繰り返すことで自然な歩き方が身につきます。犬の散歩や通勤などの日常の歩きを「練習の場」にしてみてください。", "pt": "腰痛で悩む利用者さんに歩き方を意識してもらうだけで、かなり楽になる方が多いです。薬や器具に頼る前に、まず「動き方」を見直すことが大切と実感しています。", "post": "腰痛に悩んでいる方へ🚶\n\nつま先をまっすぐに向けて、かかとから着地する。これだけで腰への負担がかなり変わります。\n\n今日の散歩や通勤で試してみてください。\n\n#腰痛 #歩き方 #姿勢 #理学療法士", "source": "日本理学療法士協会", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#腰痛", "#歩き方", "#姿勢改善", "#理学療法"]}, {"category": "🥗 食事・栄養", "title": "タンパク質が足りないと\n筋肉はどんどん衰えていく", "core": "40代以降は意識しないとタンパク質が慢性的に不足しがちです。筋肉量の維持には、毎食「手のひら1枚分」の良質なタンパク質が目安と言われています。", "detail": "筋肉の材料はタンパク質です。食欲が落ちてきた高齢者ほどタンパク質不足に陥りやすく、それが廃用症候群（使わないことで体が衰える状態）の入り口になります。<br><br>肉・魚・卵・大豆食品をバランスよく取り入れることが大切です。特に朝食にタンパク質をしっかり摂ることで、1日を通じた筋肉合成が促されます。<br><br>「プロテイン」と聞くとスポーツ選手向けのイメージがありますが、高齢者の「食が細い」問題にこそ、意識的なタンパク質摂取が重要です。", "pt": "デイケアで食欲が落ちた利用者さんを見ていると、タンパク質不足が筋力低下に直結していることをよく感じます。「しっかり食べてから動く」が、リハビリの基本です。", "post": "筋肉を守るには「食べること」も立派なトレーニングです💪\n\n毎食、手のひら1枚分のタンパク質（肉・魚・卵・大豆）を意識するだけで筋力維持につながります。\n\nPTとして「動く前に食べる」を大切にしています🍳\n\n#筋肉 #タンパク質 #食事 #理学療法士", "source": "国立健康・栄養研究所", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#タンパク質", "#筋肉", "#食事", "#廃用予防"]}, {"category": "🌙 睡眠・休養", "title": "寝る前のスマホが、睡眠の質を\n思った以上に下げていた", "core": "就寝1時間前のスマホ使用は、深い睡眠の割合を最大20%減らすという研究があります。夜の光の質を変えるだけで、朝の目覚めが変わります。", "detail": "スマホのブルーライトは、睡眠ホルモン「メラトニン」の分泌を抑制します。メラトニンが出にくくなると、入眠が遅れ・深い睡眠（ノンレム睡眠）が減少します。<br><br>特に問題なのは「明るさ」だけでなく「SNSや動画の情報刺激」。脳が興奮状態になり、質の高い睡眠に入りにくくなります。<br><br>対策は「寝る1時間前からスマホを別室へ」か「夜間モード＋読書に切り替える」。数日で効果を実感できる人が多いです。", "pt": "「最近眠れない」と話してくれる利用者さんに聞くと、夜中にスマホを見てしまうパターンが多いです。体を動かす仕事をしている僕も、スマホをやめた夜は翌朝の目覚めが明らかに違います。", "post": "寝る前のスマホ、やめるだけで朝が変わります📱💤\n\nブルーライトが睡眠ホルモンを抑えて、深い眠りを最大20%減らします。\n\n今夜から「寝る1時間前はスマホを遠ざける」だけ試してみてください。\n\n#睡眠 #スマホ断ち #健康習慣 #理学療法士", "source": "Sleep Medicine Reviews", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#睡眠", "#ブルーライト", "#夜のルーティン", "#休養"]}];
+
+// カード一覧を動的生成
+(function renderCards() {
+  const container = document.getElementById('cards-container');
+  if (!container) return;
+  container.innerHTML = tips.map((t, i) => `
+    <button class="card" onclick="openDetail(${i})">
+      <div class="card-inner">
+        <div class="card-top">
+          <span class="category-badge">${t.category}</span>
+          <span class="card-num">${String(i+1).padStart(2,'0')} / ${String(tips.length).padStart(2,'0')}</span>
+        </div>
+        <h3>${t.title}</h3>
+        <p class="card-lead">${t.core}</p>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-left">
+          <div class="avatar-sm">す</div>
+          <span>すえ（PT）</span>
+          <span class="stars-sm">${t.stars}</span>
+        </div>
+        <span class="read-more">読む →</span>
+      </div>
+    </button>
+  `).join('');
+})();
+
+function openDetail(index) {
+  const t = tips[index];
+  const detailEl = document.getElementById('detail-view');
+  document.getElementById('list-view').style.display = 'none';
+
+  detailEl.innerHTML = `
+    <button class="back-btn" onclick="closeDetail()">← 今日の3本に戻る</button>
+
+    <div class="detail-category-row">
+      <span class="category-badge">${t.category}</span>
+      <span style="font-size:12px;color:var(--text-muted)">${String(index+1).padStart(2,'0')} / 03</span>
+    </div>
+
+    <h2 class="detail-title">${t.title}</h2>
+
+    <div class="author-row">
+      <div class="avatar-md">す</div>
+      <div>
+        <div class="author-name">すえ（太一）</div>
+        <div class="author-role">理学療法士 / Fukui</div>
+      </div>
+    </div>
+
+    <div class="section-label">今日のTips</div>
+    <div class="tips-card"><p>${t.core}</p></div>
+
+    <div class="section-label">もう少し詳しく</div>
+    <p class="detail-text">${t.detail}</p>
+
+    <div class="section-label">PTすえのひとこと</div>
+    <div class="pt-note">
+      <p>${t.pt}</p>
+      <div class="sig">— 理学療法士 すえ</div>
+    </div>
+
+    <div class="section-label">リベシティ投稿用テキスト</div>
+    <div class="post-box">
+      <p id="post-text-${index}">${t.post.replace(/\n/g,'<br>')}</p>
+      <button class="copy-btn" id="copy-btn-${index}" onclick="copyText(${index})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        コピーする
+      </button>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        ${t.source}
+      </div>
+      <div class="meta-item">
+        <span class="stars">${t.stars}</span>
+        <span>信頼度：${t.reliability}</span>
+      </div>
+    </div>
+
+    <div class="tags">${t.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+
+    <div class="pagination">
+      ${index > 0 ? `<button class="page-btn" onclick="openDetail(${index-1})">← 前のTips</button>` : '<span></span>'}
+      ${index < tips.length-1 ? `<button class="page-btn" onclick="openDetail(${index+1})">次のTips →</button>` : '<span></span>'}
+    </div>
+  `;
+
+  detailEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeDetail() {
+  document.getElementById('list-view').style.display = 'block';
+  const d = document.getElementById('detail-view');
+  d.classList.remove('active');
+  d.innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyText(index) {
+  navigator.clipboard.writeText(tips[index].post).then(() => {
+    const btn = document.getElementById(`copy-btn-${index}`);
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 16 4 11"/></svg> コピーしました`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> コピーする`;
+    }, 2500);
+  });
+}
+
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+
+</body>
+</html>
