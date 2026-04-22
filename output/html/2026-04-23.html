@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日の健康Tips｜すえのPTノート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --accent: #41b37d;
+    --accent-light: #e8f7f0;
+    --accent-deep: #2d8a5e;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-muted: #a0a0a0;
+    --border: #e8e4dc;
+    --tag-bg: #f0ede6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ヘッダー */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .logo span { color: var(--accent); }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* タブ */
+  .tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tab.active { color: var(--text-primary); font-weight: 500; border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text-secondary); }
+
+  /* メイン */
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 0;
+  }
+
+  /* 一覧 */
+  .day-header {
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .day-header h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .day-header p { font-size: 13px; color: var(--text-muted); font-weight: 300; }
+
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.12s; }
+  .card:nth-child(3) { animation-delay: 0.19s; }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-2px); }
+
+  .card-inner { padding: 20px 22px; }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-light);
+    color: var(--accent-deep);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .card-num { font-size: 11px; color: var(--text-muted); }
+
+  .card h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .card-lead {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 10px 22px;
+    border-top: 1px solid var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fdfcfa;
+  }
+
+  .card-footer-left { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+
+  .avatar-sm {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white; font-weight: 700;
+  }
+
+  .stars-sm { color: var(--accent); font-size: 10px; letter-spacing: -1px; }
+  .read-more { font-size: 12px; color: var(--accent); }
+
+  /* 詳細 */
+  .detail-view { display: none; animation: fadeUp 0.35s ease both; }
+  .detail-view.active { display: block; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .detail-category-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .detail-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .avatar-md {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: white; font-weight: 700;
+  }
+
+  .author-name { font-size: 13px; font-weight: 500; }
+  .author-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .tips-card {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .tips-card p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    line-height: 1.85;
+    font-weight: 500;
+  }
+
+  .detail-text {
+    font-size: 15px;
+    line-height: 1.95;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  .pt-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .pt-note::before {
+    content: '💬';
+    position: absolute;
+    top: -12px; left: 18px;
+    background: var(--bg);
+    padding: 0 4px;
+    font-size: 18px;
+  }
+  .pt-note p { font-size: 14px; line-height: 1.85; color: var(--text-secondary); font-style: italic; }
+  .pt-note .sig { margin-top: 10px; font-size: 12px; color: var(--text-muted); font-style: normal; text-align: right; }
+
+  .post-box {
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .post-box p { font-size: 14px; line-height: 1.85; }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    background: var(--text-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: #333; }
+  .copy-btn.copied { background: var(--accent); }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .meta-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .stars { color: var(--accent); letter-spacing: -1px; }
+
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .tag { background: var(--tag-bg); color: var(--text-secondary); font-size: 12px; padding: 4px 12px; border-radius: 20px; }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">すえの<span>PT</span>ノート</div>
+  <div class="header-date">2026年4月23日（木）</div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" onclick="switchTab(this)">今日の3本</div>
+  <div class="tab" onclick="switchTab(this)">今週のまとめ</div>
+  <div class="tab" onclick="switchTab(this)">アーカイブ</div>
+</nav>
+
+<main>
+
+  <div id="list-view">
+    <div class="day-header">
+      <h2>今日の健康Tips</h2>
+      <p>運動・食事・睡眠の3テーマをお届けします</p>
+    </div>
+
+    <div class="cards" id="cards-container"></div>
+
+    <div class="pagination" style="margin-top:32px">
+      <button class="page-btn" onclick="location.href='https://toroooo829-cloud.github.io/myapp/output/html/2026-04-22.html'">← 4月22日</button>
+      <span></span>
+    </div>
+  </div>
+
+  <div id="detail-view" class="detail-view"></div>
+
+</main>
+
+<script>
+const tips = [{"category": "🧘 メンタル・ストレス", "title": "「感謝日記」3行で\n幸福感が変わるという研究", "core": "寝る前に「今日感謝できること」を3つ書き留めるだけで、4週間後に幸福感・睡眠の質・人間関係の満足度が上がったという研究があります。", "detail": "ポジティブ心理学の研究では、感謝の実践が精神的健康に与える効果は薬物療法に匹敵するレベルとも言われています。<br><br>脳はネガティブな出来事を優先的に記憶する傾向（ネガティビティバイアス）があります。感謝日記は意識的にポジティブな出来事に注目するトレーニングです。<br><br>「大きな感謝」じゃなくていい。「今日も犬と散歩できた」「おいしいコーヒーが飲めた」程度のことで十分です。継続することが最も重要です。", "pt": "介護の仕事はしんどいこともありますが、利用者さんの「ありがとう」の一言で救われます。小さな感謝を意識するようになってから、仕事の充実感が変わりました。", "post": "寝る前に「感謝できること」を3つ書くだけ✍️\n\n4週間続けると幸福感・睡眠の質が上がったという研究があります。日記帳でもスマホのメモでもOK。\n\n今夜からぜひ。\n\n#感謝日記 #ポジティブ心理学 #メンタルヘルス #睡眠", "source": "Journal of Positive Psychology", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#感謝日記", "#メンタルヘルス", "#幸福感", "#ポジティブ心理学"]}, {"category": "🌙 睡眠・休養", "title": "睡眠不足は\n「脳のゴミ」を溜め込む", "core": "睡眠中に脳は老廃物（アミロイドβ）を洗い流しています。慢性的な睡眠不足はこの働きを妨げ、認知症リスクを高めると言われています。", "detail": "脳には「グリンパティック系」と呼ばれる排水システムがあり、主に深い睡眠中に活発に働きます。このシステムが老廃物を脳脊髄液で洗い流してくれます。<br><br>1日6時間未満の睡眠が続くと、認知機能の低下・うつ・免疫力の低下といった影響が出やすくなります。<br><br>「寝だめ」は効果が薄く、毎日同じ時間に寝起きすることが最も重要です。睡眠のリズムを整えることが、長期的な脳の健康を守ります。", "pt": "リハビリの効果にも睡眠は大きく影響します。「昨夜よく眠れた」という利用者さんの日は、体の動き方が明らかに違う。睡眠は最高のリカバリーです。", "post": "睡眠中、脳は「大掃除」をしています🧠✨\n\n老廃物を洗い流すこの仕組みは深い睡眠中にしか働きません。慢性的な寝不足は認知症リスクを高めます。\n\n7時間の睡眠、今日から少しずつ意識してみてください。\n\n#睡眠 #認知症予防 #脳の健康 #理学療法士", "source": "Nature Neuroscience", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#睡眠", "#認知症予防", "#脳の健康", "#休養"]}, {"category": "🏃 運動・リハビリ", "title": "転倒を防ぐ最強の習慣は\n「立ち座り練習」だった", "core": "椅子からゆっくり立ち上がる動作を1日10回繰り返すだけで、転倒につながる下肢筋力の低下を防ぐことができます。特別な器具は不要です。", "detail": "転倒は骨折→入院→寝たきりという負のスパイラルの入り口です。その予防に最も効果的なのが、下肢の筋力維持。なかでも「大腿四頭筋（太ももの前の筋肉）」の強化が重要です。<br><br>椅子スクワット（シット・トゥ・スタンド）は、立ち座りをゆっくり繰り返すだけ。手すりや壁を使っても構いません。1回10回×1日2〜3セットから始めましょう。<br><br>「痛みがあるから動けない」という方こそ、できる範囲から始めることが大切。動かないほうが痛みが悪化することの方が多いです。", "pt": "デイケアで転倒した後に長期入院になる方を何人も見てきました。予防できた転倒がほとんどです。「まだ早い」ではなく「今から」が合言葉です。", "post": "転倒予防の第一歩は「立ち座り練習」です🧑‍🦯\n\n椅子から立つ→ゆっくり座る、これを1日10回。太ももの筋肉が鍛えられ転倒リスクがぐっと下がります。\n\nPT8年目が一番勧める習慣です💪\n\n#転倒予防 #筋トレ #理学療法士 #介護予防", "source": "国立長寿医療研究センター", "stars": "★★★", "reliability": "高（査読論文・公的機関）", "tags": ["#転倒予防", "#筋トレ", "#介護予防", "#下肢筋力"]}];
+
+// カード一覧を動的生成
+(function renderCards() {
+  const container = document.getElementById('cards-container');
+  if (!container) return;
+  container.innerHTML = tips.map((t, i) => `
+    <button class="card" onclick="openDetail(${i})">
+      <div class="card-inner">
+        <div class="card-top">
+          <span class="category-badge">${t.category}</span>
+          <span class="card-num">${String(i+1).padStart(2,'0')} / ${String(tips.length).padStart(2,'0')}</span>
+        </div>
+        <h3>${t.title}</h3>
+        <p class="card-lead">${t.core}</p>
+      </div>
+      <div class="card-footer">
+        <div class="card-footer-left">
+          <div class="avatar-sm">す</div>
+          <span>すえ（PT）</span>
+          <span class="stars-sm">${t.stars}</span>
+        </div>
+        <span class="read-more">読む →</span>
+      </div>
+    </button>
+  `).join('');
+})();
+
+function openDetail(index) {
+  const t = tips[index];
+  const detailEl = document.getElementById('detail-view');
+  document.getElementById('list-view').style.display = 'none';
+
+  detailEl.innerHTML = `
+    <button class="back-btn" onclick="closeDetail()">← 今日の3本に戻る</button>
+
+    <div class="detail-category-row">
+      <span class="category-badge">${t.category}</span>
+      <span style="font-size:12px;color:var(--text-muted)">${String(index+1).padStart(2,'0')} / 03</span>
+    </div>
+
+    <h2 class="detail-title">${t.title}</h2>
+
+    <div class="author-row">
+      <div class="avatar-md">す</div>
+      <div>
+        <div class="author-name">すえ（太一）</div>
+        <div class="author-role">理学療法士 / Fukui</div>
+      </div>
+    </div>
+
+    <div class="section-label">今日のTips</div>
+    <div class="tips-card"><p>${t.core}</p></div>
+
+    <div class="section-label">もう少し詳しく</div>
+    <p class="detail-text">${t.detail}</p>
+
+    <div class="section-label">PTすえのひとこと</div>
+    <div class="pt-note">
+      <p>${t.pt}</p>
+      <div class="sig">— 理学療法士 すえ</div>
+    </div>
+
+    <div class="section-label">リベシティ投稿用テキスト</div>
+    <div class="post-box">
+      <p id="post-text-${index}">${t.post.replace(/\n/g,'<br>')}</p>
+      <button class="copy-btn" id="copy-btn-${index}" onclick="copyText(${index})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        コピーする
+      </button>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        ${t.source}
+      </div>
+      <div class="meta-item">
+        <span class="stars">${t.stars}</span>
+        <span>信頼度：${t.reliability}</span>
+      </div>
+    </div>
+
+    <div class="tags">${t.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+
+    <div class="pagination">
+      ${index > 0 ? `<button class="page-btn" onclick="openDetail(${index-1})">← 前のTips</button>` : '<span></span>'}
+      ${index < tips.length-1 ? `<button class="page-btn" onclick="openDetail(${index+1})">次のTips →</button>` : '<span></span>'}
+    </div>
+  `;
+
+  detailEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeDetail() {
+  document.getElementById('list-view').style.display = 'block';
+  const d = document.getElementById('detail-view');
+  d.classList.remove('active');
+  d.innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyText(index) {
+  navigator.clipboard.writeText(tips[index].post).then(() => {
+    const btn = document.getElementById(`copy-btn-${index}`);
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 16 4 11"/></svg> コピーしました`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> コピーする`;
+    }, 2500);
+  });
+}
+
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+
+</body>
+</html>
